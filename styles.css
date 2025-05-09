@@ -65,3 +65,35 @@
     margin-top: 5px;
     font-style: italic;
 }
+
+/* Matching ingredients styling */
+.matching-ingredient {
+    font-weight: bold;
+    color: #2ecc71;
+}
+
+/* Match info badge */
+.match-info {
+    margin-bottom: 12px;
+}
+
+.match-badge {
+    background-color: #3498db;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: inline-block;
+}
+
+/* Update search container instructions */
+.search-container {
+    margin-bottom: 25px;
+}
+
+.search-tip {
+    font-size: 13px;
+    color: #666;
+    margin-top: 8px;
+    font-style: italic;
+}
