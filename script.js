@@ -5,6 +5,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const ingredientsInput = document.getElementById('ingredients');
     const resultsDiv = document.getElementById('results');
     
+    // Check if elements exist
+    if (!searchBtn || !ingredientsInput || !resultsDiv) {
+        console.error('One or more required HTML elements not found');
+        return;
+    }
+    
+    console.log('Script loaded successfully');
+    
     // Sample recipe data (in a real app, this would come from an API)
     const recipes = [
         {
@@ -41,6 +49,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add click event to the search button
     searchBtn.addEventListener('click', function() {
+        console.log('Search button clicked');
+        
         // Get the ingredients from the input and convert to lowercase
         const searchIngredients = ingredientsInput.value.toLowerCase().split(',').map(item => item.trim());
         
@@ -94,4 +104,6 @@ document.addEventListener('DOMContentLoaded', function() {
             resultsDiv.innerHTML = '<p>No recipes found with those ingredients. Try different ingredients!</p>';
         }
     });
+    
+    console.log('Script initialization complete');
 });
