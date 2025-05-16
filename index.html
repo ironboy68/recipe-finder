@@ -3,18 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recipe Finder</title>
+    <title>Flavor Finder | Find Recipes With Your Ingredients</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="search-container">
-    <input type="text" id="ingredients" placeholder="Enter ingredients separated by commas (e.g., chicken, rice, garlic)">
-    <button id="search-btn">Find Recipes</button>
-    <p class="search-tip">For best results, list ingredients from most to least important. The first ingredient is used as the primary search term.</p>
-</div>
-        <div id="results"></div>
+    <header class="header">
+        <div class="container">
+            <h1>Flavor Finder</h1>
+            <p class="subtitle">Turn your ingredients into delicious meals</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="search-container">
+            <div class="search-form">
+                <input type="text" id="ingredients" placeholder="Enter ingredients separated by commas (e.g., chicken, rice, garlic)">
+                <button id="search-btn">Find Recipes</button>
+            </div>
+            <p class="search-tip">Pro tip: List your ingredients from most to least important. The first ingredient is used as the primary search term. We'll find recipes containing as many of your ingredients as possible.</p>
+        </div>
+
+        <div id="results">
+            <!-- Results will appear here -->
+        </div>
     </div>
-    
+
     <script src="script.js"></script>
 </body>
 </html>
