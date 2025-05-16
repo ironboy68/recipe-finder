@@ -10,6 +10,7 @@
   --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --border-radius: 12px;
   --font-main: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  --focus-outline: 3px solid rgba(78, 205, 196, 0.5);
 }
 
 * {
@@ -30,6 +31,19 @@ body {
   max-width: 900px;
   margin: 0 auto;
   padding: 0 20px;
+}
+
+/* Accessibility */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Header Section */
@@ -96,6 +110,12 @@ input {
 input:focus {
   outline: none;
   border-color: var(--secondary-color);
+  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
+}
+
+/* Improved focus styles for keyboard navigation */
+input:focus-visible {
+  outline: var(--focus-outline);
 }
 
 button {
@@ -117,6 +137,16 @@ button:hover {
 
 button:active {
   transform: translateY(0);
+}
+
+/* Focus states for accessibility */
+button:focus {
+  outline: none;
+}
+
+button:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: 2px;
 }
 
 .search-tip {
@@ -331,6 +361,16 @@ button:active {
   transform: translateY(-2px);
 }
 
+/* Improved link focus for accessibility */
+.video-link a:focus {
+  outline: none;
+}
+
+.video-link a:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: 2px;
+}
+
 /* No results message */
 .no-results {
   text-align: center;
@@ -387,4 +427,41 @@ button:active {
 ::-webkit-scrollbar-thumb {
   background-color: var(--dark-gray);
   border-radius: 10px;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-color: #f8f9fa;
+    --light-gray: #2d3436;
+    --medium-gray: #4d5656;
+    --dark-gray: #a0a0a0;
+  }
+  
+  body {
+    background-color: #1a1a1a;
+  }
+  
+  .search-container, .recipe-card, .loading, .no-results {
+    background-color: #2d3436;
+    color: var(--text-color);
+  }
+  
+  .recipe-card h2, .ingredients h3, .instructions h3 {
+    color: var(--text-color);
+  }
+  
+  .search-tip {
+    color: #bdc3c7;
+  }
+  
+  .category-badge {
+    background-color: #d35400;
+    color: white;
+  }
+  
+  .origin-badge {
+    background-color: #0277bd;
+    color: white;
+  }
 }
