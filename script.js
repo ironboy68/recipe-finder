@@ -12,7 +12,41 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Original sample recipe data (fallback if API is down)
     const localRecipes = [
-        // Your local recipes here (same as before)
+        {
+            name: "Pasta with Tomato Sauce",
+            ingredients: ["pasta", "tomato", "garlic", "olive oil", "basil"],
+            instructions: "Cook pasta. Sauté garlic in olive oil. Add tomatoes and cook for 10 minutes. Add basil and serve over pasta.",
+            prepTime: "20 minutes",
+            thumbnail: "https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg"
+        },
+        {
+            name: "Vegetable Stir Fry",
+            ingredients: ["broccoli", "carrot", "pepper", "soy sauce", "rice"],
+            instructions: "Cook rice. Stir fry vegetables. Add soy sauce. Serve over rice.",
+            prepTime: "15 minutes",
+            thumbnail: "https://www.themealdb.com/images/media/meals/xutquv1505330523.jpg"
+        },
+        {
+            name: "Chicken Sandwich",
+            ingredients: ["chicken", "bread", "lettuce", "tomato", "mayonnaise"],
+            instructions: "Grill chicken. Toast bread. Assemble sandwich with all ingredients.",
+            prepTime: "10 minutes",
+            thumbnail: "https://www.themealdb.com/images/media/meals/sbx7n71587673021.jpg"
+        },
+        {
+            name: "Vegetable Soup",
+            ingredients: ["carrot", "potato", "onion", "celery", "vegetable broth"],
+            instructions: "Dice vegetables. Add to pot with broth. Simmer for 30 minutes.",
+            prepTime: "40 minutes",
+            thumbnail: "https://www.themealdb.com/images/media/meals/2x5jwe1619006953.jpg"
+        },
+        {
+            name: "Simple Salad",
+            ingredients: ["lettuce", "tomato", "cucumber", "olive oil", "vinegar"],
+            instructions: "Chop vegetables. Mix together. Dress with olive oil and vinegar.",
+            prepTime: "5 minutes",
+            thumbnail: "https://www.themealdb.com/images/media/meals/wvqpwt1468339226.jpg"
+        }
     ];
     
     // Add click event to the search button
@@ -82,78 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     displayFilteredRecipes(mealsToProcess, []);
                     return;
                 }
-                // Add the toggle instructions function to window scope
-window.toggleInstructions = function(id, button) {
-    const element = document.getElementById(id);
-    if (element.classList.contains('collapsed')) {
-        element.classList.remove('collapsed');
-        button.textContent = 'Hide instructions';
-        button.classList.add('expanded');
-    } else {
-        element.classList.add('collapsed');
-        button.textContent = 'Show instructions';
-        button.classList.remove('expanded');
-    }
-};
-
-// Collapse all instructions initially
-recipes.forEach(recipe => {
-    if (recipe.details) {
-        const instructionsElement = document.getElementById(`instructions-${recipe.details.idMeal}`);
-        if (instructionsElement) {
-            instructionsElement.classList.add('collapsed');
-        }
-    }
-});
-                // Modify the recipe card HTML in your displayFilteredRecipes function
-// Process instructions for better formatting
-const instructions = recipeDetails.strInstructions
-    .replace(/\r\n/g, '\n')
-    .replace(/\n\n/g, '\n')
-    .trim();
-
-// Create recipe card
-const recipeCard = document.createElement('div');
-recipeCard.className = 'recipe-card';
-recipeCard.innerHTML = `
-    <img src="${recipeDetails.strMealThumb}" alt="${recipeDetails.strMeal}" class="recipe-image">
-    <div class="recipe-content">
-        <h2>${recipeDetails.strMeal}</h2>
-        
-        <div>
-            <span class="match-badge">${recipe.matchCount} of ${recipe.totalSearched} ingredients matched</span>
-        </div>
-        
-        <div class="recipe-meta">
-            <span class="category-badge">${recipeDetails.strCategory}</span>
-            <span class="origin-badge">${recipeDetails.strArea}</span>
-        </div>
-        
-        <div class="ingredients">
-            <h3>Ingredients</h3>
-            <ul>
-                ${ingredients.join('')}
-            </ul>
-        </div>
-        
-        <div class="instructions">
-            <h3>Instructions</h3>
-            <div class="collapse-content" id="instructions-${recipeDetails.idMeal}">
-                <p>${instructions}</p>
-            </div>
-            <button class="collapse-btn" onclick="toggleInstructions('instructions-${recipeDetails.idMeal}', this)">
-                Show instructions
-            </button>
-        </div>
-        
-        <div class="card-footer">
-            ${recipeDetails.strYoutube ? `
-            <div class="video-link">
-                <a href="${recipeDetails.strYoutube}" target="_blank">Watch Video</a>
-            </div>` : '<div></div>'}
-        </div>
-    </div>
-`;
+                
                 // Fetch detailed information for each meal
                 mealsToProcess.forEach(meal => {
                     fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal.idMeal}`)
@@ -347,9 +310,11 @@ recipeCard.innerHTML = `
             if (element.classList.contains('collapsed')) {
                 element.classList.remove('collapsed');
                 button.textContent = 'Hide instructions';
+                button.classList.add('expanded');
             } else {
                 element.classList.add('collapsed');
                 button.textContent = 'Show instructions';
+                button.classList.remove('expanded');
             }
         };
         
@@ -414,7 +379,7 @@ recipeCard.innerHTML = `
                             <p>${recipe.instructions}</p>
                         </div>
                         
-                        <div class="card-footer">
+                       <div class="card-footer">
                             <p>Prep time: ${recipe.prepTime}</p>
                         </div>
                     </div>
