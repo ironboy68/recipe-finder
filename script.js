@@ -10,24 +10,32 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    console.log('Script loaded successfully');
-    
     // Original sample recipe data (fallback if API is down)
     const localRecipes = [
         // Your local recipes here (same as before)
     ];
     
     // Add click event to the search button
-    searchBtn.addEventListener('click', function() {
+    searchBtn.addEventListener('click', performSearch);
+    
+    // Add enter key event on input field
+    ingredientsInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            performSearch();
+        }
+    });
+    
+    function performSearch() {
         // Show loading state
-        resultsDiv.innerHTML = '<div class="loading">Searching for recipes...</div>';
+        resultsDiv.innerHTML = '<div class="loading">Searching for delicious recipes...</div>';
         
         // Get the ingredients from the input and convert to lowercase
         const searchIngredientsText = ingredientsInput.value.trim().toLowerCase();
         
         // Check if the input is empty
         if (!searchIngredientsText) {
-            resultsDiv.innerHTML = '<p>Please enter at least one ingredient</p>';
+            resultsDiv.innerHTML = '<div class="no-results"><p>Please enter at least one ingredient to start cooking!</p></div>';
             return;
         }
         
@@ -46,12 +54,12 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${mainIngredient}`)
             .then(response => response.json())
             .then(data => {
-                // Clear results
-                resultsDiv.innerHTML = '';
-                
                 // Check if recipes were found
                 if (!data.meals) {
-                    resultsDiv.innerHTML = `<p>No recipes found with ${mainIngredient}. Try a different ingredient!</p>`;
+                    resultsDiv.innerHTML = `<div class="no-results">
+                        <p>No recipes found with "${mainIngredient}".</p>
+                        <p>Try a different ingredient or check your spelling!</p>
+                    </div>`;
                     return;
                 }
                 
@@ -62,8 +70,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Display a header showing search terms
                 const searchTerms = searchIngredients.join(', ');
                 resultsDiv.innerHTML = `
-                    <h3>Searching for recipes with: ${searchTerms}</h3>
-                    <div class="loading">Finding matches...</div>
+                    <h3>Finding the perfect recipes with ${searchTerms}</h3>
+                    <div class="loading">Discovering matches...</div>
                 `;
                 
                 // Process up to 15 meals (to avoid too many requests)
@@ -126,13 +134,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error fetching from TheMealDB:', error);
                 // Show error message and fall back to local recipes
                 resultsDiv.innerHTML = `
-                    <p>Couldn't connect to recipe database. Showing local recipes instead:</p>
+                    <div class="no-results">
+                        <p>Couldn't connect to the recipe database.</p>
+                        <p>Showing local recipes instead:</p>
+                    </div>
                 `;
                 
                 // Filter local recipes based on ingredients
                 displayLocalRecipes(searchIngredients);
             });
-    });
+    }
     
     // Function to display filtered recipes
     function displayFilteredRecipes(recipes, additionalIngredients) {
@@ -151,12 +162,19 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Check if any matching recipes were found
         if (recipes.length === 0) {
-            resultsDiv.innerHTML = `<p>No recipes found matching all your ingredients. Try fewer ingredients or different combinations.</p>`;
+            resultsDiv.innerHTML = `
+                <div class="no-results">
+                    <p>No recipes found matching all your ingredients.</p>
+                    <p>Try fewer ingredients or different combinations!</p>
+                </div>`;
             return;
         }
         
         // Display a header with the count of recipes found
-        resultsDiv.innerHTML = `<h3>Found ${recipes.length} recipes matching your ingredients</h3>`;
+        resultsDiv.innerHTML = `<h3>Found ${recipes.length} delicious recipes for you!</h3>
+                                <div class="recipe-grid"></div>`;
+        
+        const recipeGrid = resultsDiv.querySelector('.recipe-grid');
         
         // Display each recipe
         recipes.forEach(recipe => {
@@ -186,45 +204,91 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 
+                // Process instructions for better formatting
+                const instructions = recipeDetails.strInstructions
+                    .replace(/\r\n/g, '\n')
+                    .replace(/\n\n/g, '\n')
+                    .trim();
+                
                 // Create recipe card
                 const recipeCard = document.createElement('div');
                 recipeCard.className = 'recipe-card';
                 recipeCard.innerHTML = `
-                    <h2>${recipeDetails.strMeal}</h2>
-                    <div class="match-info">
-                        <span class="match-badge">${recipe.matchCount} of ${recipe.totalSearched} ingredients matched</span>
+                    <img src="${recipeDetails.strMealThumb}" alt="${recipeDetails.strMeal}" class="recipe-image">
+                    <div class="recipe-content">
+                        <h2>${recipeDetails.strMeal}</h2>
+                        
+                        <div>
+                            <span class="match-badge">${recipe.matchCount} of ${recipe.totalSearched} ingredients matched</span>
+                        </div>
+                        
+                        <div class="recipe-meta">
+                            <span class="category-badge">${recipeDetails.strCategory}</span>
+                            <span class="origin-badge">${recipeDetails.strArea}</span>
+                        </div>
+                        
+                        <div class="ingredients">
+                            <h3>Ingredients</h3>
+                            <ul>
+                                ${ingredients.join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="instructions">
+                            <h3>Instructions</h3>
+                            <div class="collapse-content" id="instructions-${recipeDetails.idMeal}">
+                                <p>${instructions}</p>
+                            </div>
+                            <button class="collapse-btn" onclick="toggleInstructions('instructions-${recipeDetails.idMeal}', this)">
+                                Show instructions
+                            </button>
+                        </div>
+                        
+                        <div class="card-footer">
+                            ${recipeDetails.strYoutube ? `
+                            <div class="video-link">
+                                <a href="${recipeDetails.strYoutube}" target="_blank">Watch Video</a>
+                            </div>` : '<div></div>'}
+                        </div>
                     </div>
-                    <img src="${recipeDetails.strMealThumb}" alt="${recipeDetails.strMeal}" style="max-width:100%; border-radius:8px;">
-                    <p><strong>Category:</strong> ${recipeDetails.strCategory}</p>
-                    <p><strong>Origin:</strong> ${recipeDetails.strArea}</p>
-                    <div class="ingredients">
-                        <strong>Ingredients:</strong>
-                        <ul>
-                            ${ingredients.join('')}
-                        </ul>
-                    </div>
-                    <div class="instructions">
-                        <strong>Instructions:</strong>
-                        <p>${recipeDetails.strInstructions}</p>
-                    </div>
-                    ${recipeDetails.strYoutube ? `
-                    <div class="video-link">
-                        <a href="${recipeDetails.strYoutube}" target="_blank">Watch Video Tutorial</a>
-                    </div>` : ''}
                 `;
                 
-                // Add the recipe card to the results
-                resultsDiv.appendChild(recipeCard);
+                // Add the recipe card to the grid
+                recipeGrid.appendChild(recipeCard);
             } else {
                 // For recipes without detailed processing (should not happen in this flow)
                 const recipeCard = document.createElement('div');
                 recipeCard.className = 'recipe-card';
                 recipeCard.innerHTML = `
-                    <h2>${recipe.strMeal}</h2>
-                    <img src="${recipe.strMealThumb}" alt="${recipe.strMeal}" style="max-width:100%; border-radius:8px;">
-                    <p>Basic recipe information. Search again for details.</p>
+                    <img src="${recipe.strMealThumb}" alt="${recipe.strMeal}" class="recipe-image">
+                    <div class="recipe-content">
+                        <h2>${recipe.strMeal}</h2>
+                        <p>Basic recipe information. Search again for details.</p>
+                    </div>
                 `;
-                resultsDiv.appendChild(recipeCard);
+                recipeGrid.appendChild(recipeCard);
+            }
+        });
+        
+        // Add the toggle instructions function to window scope
+        window.toggleInstructions = function(id, button) {
+            const element = document.getElementById(id);
+            if (element.classList.contains('collapsed')) {
+                element.classList.remove('collapsed');
+                button.textContent = 'Hide instructions';
+            } else {
+                element.classList.add('collapsed');
+                button.textContent = 'Show instructions';
+            }
+        };
+        
+        // Collapse all instructions initially
+        recipes.forEach(recipe => {
+            if (recipe.details) {
+                const instructionsElement = document.getElementById(`instructions-${recipe.details.idMeal}`);
+                if (instructionsElement) {
+                    instructionsElement.classList.add('collapsed');
+                }
             }
         });
     }
@@ -233,6 +297,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayLocalRecipes(searchIngredients) {
         // Flag to track if any recipes were found
         let recipesFound = false;
+        
+        const recipeGrid = document.createElement('div');
+        recipeGrid.className = 'recipe-grid';
+        resultsDiv.appendChild(recipeGrid);
         
         // Filter local recipes based on ingredients
         localRecipes.forEach(recipe => {
@@ -250,27 +318,49 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Create the recipe card HTML
                 recipeCard.innerHTML = `
-                    <h2>${recipe.name}</h2>
-                    ${recipe.thumbnail ? `<img src="${recipe.thumbnail}" alt="${recipe.name}" style="max-width:100%; border-radius:8px;">` : ''}
-                    <div class="match-info">
-                        <span class="match-badge">${matchingIngredients.length} of ${searchIngredients.length} ingredients matched</span>
+                    ${recipe.thumbnail ? `<img src="${recipe.thumbnail}" alt="${recipe.name}" class="recipe-image">` : ''}
+                    <div class="recipe-content">
+                        <h2>${recipe.name}</h2>
+                        
+                        <div>
+                            <span class="match-badge">${matchingIngredients.length} of ${searchIngredients.length} ingredients matched</span>
+                        </div>
+                        
+                        <div class="ingredients">
+                            <h3>Ingredients</h3>
+                            <ul>
+                                ${recipe.ingredients.map(ing => {
+                                    const isMatching = matchingIngredients.some(m => ing.includes(m));
+                                    return isMatching 
+                                        ? `<li class="matching-ingredient">${ing}</li>` 
+                                        : `<li>${ing}</li>`;
+                                }).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="instructions">
+                            <h3>Instructions</h3>
+                            <p>${recipe.instructions}</p>
+                        </div>
+                        
+                        <div class="card-footer">
+                            <p>Prep time: ${recipe.prepTime}</p>
+                        </div>
                     </div>
-                    <p><strong>Matching ingredients:</strong> ${matchingIngredients.join(', ')}</p>
-                    <p><strong>All ingredients:</strong> ${recipe.ingredients.join(', ')}</p>
-                    <p><strong>Prep time:</strong> ${recipe.prepTime}</p>
-                    <p><strong>Instructions:</strong> ${recipe.instructions}</p>
                 `;
                 
-                // Add the recipe card to the results
-                resultsDiv.appendChild(recipeCard);
+                // Add the recipe card to the grid
+                recipeGrid.appendChild(recipeCard);
             }
         });
         
         // If no local recipes were found, show a message
         if (!recipesFound) {
-            resultsDiv.innerHTML += '<p>No local recipes found with those ingredients. Try different ingredients!</p>';
+            resultsDiv.innerHTML = `
+                <div class="no-results">
+                    <p>No recipes found with those ingredients.</p>
+                    <p>Try different ingredients or check your spelling!</p>
+                </div>`;
         }
     }
-    
-    console.log('Script initialization complete');
 });
