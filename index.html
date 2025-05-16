@@ -6,6 +6,7 @@
     <title>Flavor Finder | Find Recipes With Your Ingredients</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍳</text></svg>">
 </head>
 <body>
     <header class="header">
@@ -15,9 +16,10 @@
         </div>
     </header>
 
-    <div class="container">
+    <main class="container">
         <div class="search-container">
             <div class="search-form">
+                <label for="ingredients" class="visually-hidden">Enter ingredients</label>
                 <input type="text" id="ingredients" placeholder="Enter ingredients separated by commas (e.g., chicken, rice, garlic)">
                 <button id="search-btn">Find Recipes</button>
             </div>
@@ -27,7 +29,7 @@
         <div id="results">
             <!-- Results will appear here -->
         </div>
-    </div>
+    </main>
 
     <script src="script.js"></script>
 </body>
